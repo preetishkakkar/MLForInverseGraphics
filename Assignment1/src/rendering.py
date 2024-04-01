@@ -31,7 +31,7 @@ def render_point_cloud(
     height, width = resolution
 
     """create white canvas"""
-    canvases = torch.ones(batch_size, height, width)
+    canvases = torch.ones(batch_size, width, height)
 
     homogenized_vertices = homogenize_points(vertices)
 
@@ -50,7 +50,7 @@ def render_point_cloud(
             "make corresponding color on canvas black"
             ycoord = math.floor(height * projected_pt[0].item())
             xcoord = math.floor(height * projected_pt[1].item())
-            current_canvas[ycoord][xcoord] = 0.0
+            current_canvas[xcoord][ycoord] = 0.0
 
     return canvases
 

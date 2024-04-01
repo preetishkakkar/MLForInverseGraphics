@@ -2,7 +2,11 @@ from pathlib import Path
 from typing import Literal, TypedDict
 
 from jaxtyping import Float
+import torch
 from torch import Tensor
+import json
+from PIL import Image
+import numpy
 
 
 class PuzzleDataset(TypedDict):
@@ -13,6 +17,27 @@ class PuzzleDataset(TypedDict):
 
 def load_dataset(path: Path) -> PuzzleDataset:
     """Load the dataset into the required format."""
+
+    dataset = {}
+
+    absolute_dataset_path = path.resolve()
+
+    with open(absolute_dataset_path / "metadata.json", "r") as f:
+        metadata = json.load(f)
+        dataset["extrinsics"] = torch.tensor(metadata["extrinsics"])
+        dataset["intrinsics"] = torch.tensor(metadata["intrinsics"])
+
+    imgs = []
+    for i in range(32):
+        i = str(i).zfill(2)
+        img_path = absolute_dataset_path / "images" / f"{i}.png"
+        img_data = Image.open(img_path)
+        img = torch.tensor(numpy.asarray(img_data))
+        imgs += [img]
+
+    dataset["images"] = torch.stack(imgs)
+
+    return dataset
 
     raise NotImplementedError("This is your homework.")
 
